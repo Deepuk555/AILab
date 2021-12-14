@@ -1,0 +1,148 @@
+board = [' '] * 9
+
+
+def display_board(board):
+    print("   |   |")
+    print(" " + board[0] + " | " + board[1] + " | " + board[2])
+    print("   |   |")
+    print("-----------")
+    print("   |   |")
+    print(" " + board[3] + " | " + board[4] + " | " + board[5])
+    print("   |   |")
+    print("-----------")
+    print("   |   |")
+    print(" " + board[6] + " | " + board[7] + " | " + board[8])
+    print("   |   |")
+
+
+# Create a function to check if anyone won, Use marks "X" or "O"
+
+
+def check_win(bo, player_mark):
+    # If the player has won then there must be 3 consecutive Player values
+    return ((bo[6] == player_mark and bo[7] == player_mark and bo[8] == player_mark) or
+            (bo[3] == player_mark and bo[4] == player_mark and bo[5] == player_mark) or
+            (bo[0] == player_mark and bo[1] == player_mark and bo[2] == player_mark) or
+            (bo[6] == player_mark and bo[3] == player_mark and bo[0] == player_mark) or
+            (bo[7] == player_mark and bo[4] == player_mark and bo[1] == player_mark) or
+            (bo[8] == player_mark and bo[5] == player_mark and bo[2] == player_mark) or
+            (bo[6] == player_mark and bo[4] == player_mark and bo[2] == player_mark) or
+            (bo[8] == player_mark and bo[4] == player_mark and bo[0] == player_mark))
+
+
+# Create a function to check its a Draw
+def check_draw(self):
+    return ' ' not in board
+
+
+# Create a Function that makes a copy of the board
+def board_copy(board):
+    cpyboard = []
+    for i in board:
+        cpyboard.append(i)
+    return cpyboard
+
+
+# Strategy if others fail
+def selectRandom(li):
+    import random
+    ln = len(li)
+    r = random.randrange(0, ln)
+    return li[r]
+
+
+def win_strategy(possibleMoves):
+    move = 0
+    cornersOpen = []
+    for i in possibleMoves:
+        if i in [0, 2, 6, 8]:
+            cornersOpen.append(i)
+    if len(cornersOpen) > 0:
+        move = selectRandom(cornersOpen)
+        return move
+
+    if 5 in possibleMoves:
+        move = 4
+        return move
+
+    edgesOpen = []
+    for i in possibleMoves:
+        if i in [1, 3, 5, 7]:
+            edgesOpen.append(i)
+    if len(edgesOpen) > 0:
+        move = selectRandom(edgesOpen)
+
+    return move
+
+
+# Agents move
+
+def get_agent_move(board):
+    # Return agent move with your strategy
+    possibleMoves = [x for x, letter in enumerate(board) if letter == ' ']
+    for L in ['O', 'X']:
+        for i in possibleMoves:
+            cpyboard = board_copy(board)
+            cpyboard[i] = L  # test_win_move
+            if check_win(cpyboard, L):
+                move = i
+                return move
+    move = win_strategy(possibleMoves)
+    return move
+
+
+# Assemble the game  take player as X and comp as O
+def insertLetter(letter, pos):
+    board[pos] = letter
+
+
+def spaceIsFree(pos):
+    return board[pos] == ' '
+
+
+def playerMove():
+    run = True
+    while run:
+        move = input(" Please select a position to place a 'X' (1-9) : ")
+        try:
+            move = int(move)
+            move = move - 1
+            if move >= 0 and move < 9:
+                if spaceIsFree(move):
+                    run = False
+                    insertLetter('X', move)
+                else:
+                    print("Sorry this space is occupied!")
+            else:
+                ("Please type a number within the range!")
+        except:
+            print("Please type a number")
+
+
+def tictactoe(board):
+    print("Welcome to Tic Tac Toe!!!")
+    display_board(board)
+
+    while not (check_draw(board)):
+        if not (check_win(board, 'O')):
+            playerMove()
+            display_board(board)
+        else:
+            print('Sorry O\'s won this time!')
+            break
+
+        if not (check_win(board, 'X')):
+            move = get_agent_move(board)
+            insertLetter('O', move)
+            print("Computer placed an 'O' in position ", move)
+            display_board(board)
+        else:
+            print('X\'s won this time! Nice Play!')
+            break
+
+    if (check_draw(board)):
+        print("Tie game!")
+
+
+# Play!!!
+tictactoe(board)
